@@ -1,0 +1,19 @@
+{
+  "name": "AssistLine - Support Client",
+  "short_name": "AssistLine",
+  "description": "Demo PWA d'une hotline de support client (SAV) : installable, fonctionne hors-ligne, synchronise les tickets au retour du reseau.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "/assistline",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "lang": "fr",
+  "dir": "ltr",
+  "categories": ["business", "utilities"],
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

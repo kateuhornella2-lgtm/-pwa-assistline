@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AssistLine - Support Client</title>
+<meta name="theme-color" content="#2563eb">
+<meta name="description" content="Demo PWA d'une hotline de support client : installable, hors-ligne, synchronisation automatique.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="icons/icon.svg" alt="" class="brand-logo">
+    <div>
+      <strong>AssistLine</strong>
+      <span class="brand-sub">Hotline support client</span>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span id="netStatus" class="status-badge status-online">En ligne</span>
+    <button id="installBtn" class="btn btn-ghost" hidden>Installer l'app</button>
+  </div>
+</header>
+
+<div id="toast" class="toast" hidden></div>
+
+<nav class="tabs" aria-label="Navigation principale">
+  <button class="tab-btn active" data-tab="accueil">Accueil</button>
+  <button class="tab-btn" data-tab="nouveau">Nouveau ticket</button>
+  <button class="tab-btn" data-tab="tickets">Mes tickets</button>
+  <button class="tab-btn" data-tab="faq">FAQ</button>
+  <button class="tab-btn" data-tab="contact">Contact</button>
+</nav>
+
+<main>
+
+  <section id="tab-accueil" class="tab-panel active">
+    <h1>Bienvenue sur AssistLine</h1>
+    <p class="lead">Cette application est une <strong>demo PWA</strong> illustrant le fonctionnement d'une hotline de support client : elle s'installe comme une app native, reste utilisable hors-ligne et synchronise vos tickets des que le reseau revient.</p>
+
+    <div class="grid-cards">
+      <div class="card">
+        <h3>📲 Installable</h3>
+        <p>Ajoutez AssistLine sur votre ecran d'accueil grace au bouton "Installer l'app" (ou au menu du navigateur).</p>
+      </div>
+      <div class="card">
+        <h3>📴 Fonctionne hors-ligne</h3>
+        <p>Coupez votre connexion : l'interface reste accessible grace au Service Worker qui met en cache l'app.</p>
+      </div>
+      <div class="card">
+        <h3>🔄 Synchro automatique</h3>
+        <p>Creez un ticket hors-ligne : il est mis en file d'attente puis envoye automatiquement au retour du reseau.</p>
+      </div>
+      <div class="card">
+        <h3>🔔 Notifications</h3>
+        <p>Simulez une reponse d'un agent support via une notification systeme, meme app en arriere-plan.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Astuce test :</strong> ouvrez les DevTools &gt; onglet Network &gt; passez en "Offline", puis naviguez dans l'app ou creez un ticket.
+    </div>
+  </section>
+
+  <section id="tab-nouveau" class="tab-panel">
+    <h1>Ouvrir un ticket</h1>
+    <p>Decrivez votre probleme, un agent de la hotline vous repondra. Cela fonctionne meme hors-ligne : votre demande sera envoyee des que possible.</p>
+    <form id="ticketForm" class="form">
+      <label for="subject">Sujet</label>
+      <select id="subject" required>
+        <option value="">Choisissez un sujet</option>
+        <option value="Facturation">Facturation</option>
+        <option value="Probleme technique">Probleme technique</option>
+        <option value="Livraison">Livraison</option>
+        <option value="Autre">Autre</option>
+      </select>
+
+      <label for="priority">Priorite</label>
+      <select id="priority">
+        <option value="Normale">Normale</option>
+        <option value="Urgente">Urgente</option>
+      </select>
+
+      <label for="message">Message</label>
+      <textarea id="message" rows="5" required placeholder="Expliquez votre demande..."></textarea>
+
+      <button type="submit" class="btn btn-primary">Envoyer le ticket</button>
+    </form>
+  </section>
+
+  <section id="tab-tickets" class="tab-panel">
+    <h1>Mes tickets</h1>
+    <p id="ticketsEmpty" class="muted">Aucun ticket pour le moment. Creez-en un depuis l'onglet "Nouveau ticket".</p>
+    <ul id="ticketList" class="ticket-list"></ul>
+  </section>
+
+  <section id="tab-faq" class="tab-panel">
+    <h1>Questions frequentes</h1>
+    <div class="accordion" id="faqAccordion">
+      <div class="accordion-item">
+        <button class="accordion-trigger">Quel est le delai de reponse moyen ?</button>
+        <div class="accordion-content"><p>Notre hotline repond generalement sous 24h ouvrees, moins pour les demandes urgentes.</p></div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-trigger">Puis-je utiliser l'app sans connexion internet ?</button>
+        <div class="accordion-content"><p>Oui. L'interface reste consultable hors-ligne et vos tickets sont mis en file d'attente puis synchronises automatiquement au retour du reseau.</p></div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-trigger">Comment installer l'application ?</button>
+        <div class="accordion-content"><p>Cliquez sur "Installer l'app" en haut de l'ecran, ou utilisez l'option "Ajouter a l'ecran d'accueil / Installer" de votre navigateur.</p></div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-trigger">Comment contacter un agent immediatement ?</button>
+        <div class="accordion-content"><p>Rendez-vous dans l'onglet "Contact" pour appeler ou envoyer un email directement a la hotline.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-contact" class="tab-panel">
+    <h1>Contacter la hotline</h1>
+    <div class="contact-card">
+      <a class="contact-action" href="tel:+33100000000">📞 Appeler le 01 00 00 00 00</a>
+      <a class="contact-action" href="mailto:support@assistline.demo">✉️ support@assistline.demo</a>
+      <button id="notifyBtn" class="contact-action as-button">🔔 Simuler une reponse d'agent (notification)</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>AssistLine — projet de demonstration PWA.</p>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
