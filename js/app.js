@@ -171,13 +171,13 @@
       priority,
       message,
       date: Date.now(),
-      status: navigator.onLine ? "synced" : "pending",
+      status: isOnline ? "synced" : "pending",
     });
     saveTickets(tickets);
     renderTickets();
     ticketForm.reset();
     activateTab("tickets");
-    showToast(navigator.onLine ? "Ticket envoye a la hotline." : "Hors-ligne : ticket mis en file d'attente.");
+    showToast(isOnline ? "Ticket envoye a la hotline." : "Hors-ligne : ticket mis en file d'attente.");
   });
 
   function syncPendingTickets() {
