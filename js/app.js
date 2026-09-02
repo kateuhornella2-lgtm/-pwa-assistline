@@ -31,16 +31,38 @@
 
   // ---------- Statut reseau ----------
   const netStatus = document.getElementById("netStatus");
+  let isOnline = navigator.onLine;
 
-  function updateNetStatus() {
-    const online = navigator.onLine;
+  function updateNetStatus(online) {
+    const wasOnline = isOnline;
+    isOnline = online;
     netStatus.textContent = online ? "En ligne" : "Hors-ligne";
     netStatus.classList.toggle("status-online", online);
     netStatus.classList.toggle("status-offline", !online);
+    if (online && !wasOnline) syncPendingTickets();
   }
-  updateNetStatus();
-  window.addEventListener("online", () => { updateNetStatus(); syncPendingTickets(); });
-  window.addEventListener("offline", updateNetStatus);
+
+  // navigator.onLine ne reflete que l'etat de l'interface reseau, pas un
+  // vrai acces a Internet : on verifie activement via une requete legere.
+  async function probeConnectivity() {
+    if (!navigator.onLine) { updateNetStatus(false); return; }
+    try {
+      await fetch(`./manifest.json?probe=${Date.now()}`, {
+        method: "HEAD",
+        cache: "no-store",
+        signal: AbortSignal.timeout(4000),
+      });
+      updateNetStatus(true);
+    } catch {
+      updateNetStatus(false);
+    }
+  }
+
+  updateNetStatus(navigator.onLine);
+  probeConnectivity();
+  setInterval(probeConnectivity, 5000);
+  window.addEventListener("online", probeConnectivity);
+  window.addEventListener("offline", () => updateNetStatus(false));
 
   // ---------- Toast ----------
   const toastEl = document.getElementById("toast");
