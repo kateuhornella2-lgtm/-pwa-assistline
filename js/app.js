@@ -25,6 +25,10 @@
     btn.addEventListener("click", () => activateTab(btn.dataset.tab));
   });
 
+  document.querySelectorAll(".card-link").forEach((btn) => {
+    btn.addEventListener("click", () => activateTab(btn.dataset.goto));
+  });
+
   // ---------- Statut reseau ----------
   const netStatus = document.getElementById("netStatus");
 

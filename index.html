@@ -41,29 +41,31 @@
 
   <section id="tab-accueil" class="tab-panel active">
     <h1>Bienvenue sur AssistLine</h1>
-    <p class="lead">Cette application est une <strong>demo PWA</strong> illustrant le fonctionnement d'une hotline de support client : elle s'installe comme une app native, reste utilisable hors-ligne et synchronise vos tickets des que le reseau revient.</p>
+    <p class="lead">Notre hotline de support client est disponible 7j/7 pour repondre a vos demandes de facturation, problemes techniques ou livraisons. Ouvrez un ticket, suivez son statut ou contactez directement un agent.</p>
 
-    <div class="grid-cards">
-      <div class="card">
-        <h3>📲 Installable</h3>
-        <p>Ajoutez AssistLine sur votre ecran d'accueil grace au bouton "Installer l'app" (ou au menu du navigateur).</p>
-      </div>
-      <div class="card">
-        <h3>📴 Fonctionne hors-ligne</h3>
-        <p>Coupez votre connexion : l'interface reste accessible grace au Service Worker qui met en cache l'app.</p>
-      </div>
-      <div class="card">
-        <h3>🔄 Synchro automatique</h3>
-        <p>Creez un ticket hors-ligne : il est mis en file d'attente puis envoye automatiquement au retour du reseau.</p>
-      </div>
-      <div class="card">
-        <h3>🔔 Notifications</h3>
-        <p>Simulez une reponse d'un agent support via une notification systeme, meme app en arriere-plan.</p>
-      </div>
+    <div class="stat-row">
+      <div class="stat"><strong>24h</strong><span>Delai moyen de reponse</span></div>
+      <div class="stat"><strong>7j/7</strong><span>Disponibilite</span></div>
+      <div class="stat"><strong>4.8/5</strong><span>Satisfaction client</span></div>
     </div>
 
-    <div class="callout">
-      <strong>Astuce test :</strong> ouvrez les DevTools &gt; onglet Network &gt; passez en "Offline", puis naviguez dans l'app ou creez un ticket.
+    <div class="grid-cards">
+      <button class="card card-link" data-goto="nouveau">
+        <h3>🎫 Ouvrir un ticket</h3>
+        <p>Decrivez votre probleme, un agent de la hotline vous repondra rapidement.</p>
+      </button>
+      <button class="card card-link" data-goto="tickets">
+        <h3>📋 Mes tickets</h3>
+        <p>Suivez l'etat de vos demandes en cours et l'historique de vos echanges.</p>
+      </button>
+      <button class="card card-link" data-goto="faq">
+        <h3>❓ Questions frequentes</h3>
+        <p>Trouvez rapidement une reponse aux questions les plus posees.</p>
+      </button>
+      <button class="card card-link" data-goto="contact">
+        <h3>📞 Contacter un agent</h3>
+        <p>Besoin d'une reponse immediate ? Appelez ou ecrivez directement a la hotline.</p>
+      </button>
     </div>
   </section>
 
