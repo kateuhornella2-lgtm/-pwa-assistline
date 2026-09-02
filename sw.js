@@ -1,4 +1,4 @@
-const CACHE_NAME = "assistline-v1";
+const CACHE_NAME = "assistline-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -45,10 +45,12 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Stale-while-revalidate : sert le cache immediatement (rapide, marche
+  // hors-ligne) tout en rafraichissant le cache en arriere-plan a chaque
+  // visite, pour ne jamais rester bloque sur une vieille version.
   event.respondWith(
     caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request)
+      const networkFetch = fetch(request)
         .then((response) => {
           if (response.ok) {
             const copy = response.clone();
@@ -57,6 +59,7 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => cached);
+      return cached || networkFetch;
     })
   );
 });

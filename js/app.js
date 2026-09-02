@@ -10,6 +10,20 @@
         console.error("Echec enregistrement service worker", err);
       });
     });
+
+    // Recharge une seule fois quand une nouvelle version du SW remplace une
+    // version deja active, pour ne jamais rester bloque sur un vieux
+    // app.js/css en cache. On ignore la toute premiere prise de controle
+    // (controller encore null) pour ne pas recharger inutilement au tout
+    // premier chargement.
+    if (navigator.serviceWorker.controller) {
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+    }
   }
 
   // ---------- Navigation par onglets ----------
