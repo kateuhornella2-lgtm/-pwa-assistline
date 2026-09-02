@@ -1,4 +1,4 @@
-const CACHE_NAME = "assistline-v2";
+const CACHE_NAME = "assistline-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -28,39 +28,30 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+// Reseau en priorite partout : on essaie toujours d'avoir la version la
+// plus fraiche, et on ne retombe sur le cache que si la requete echoue
+// (vraiment hors-ligne). Plus simple et plus previsible que du
+// stale-while-revalidate pour un projet itere frequemment.
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
 
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
+  event.respondWith(
+    fetch(request)
+      .then((response) => {
+        if (response.ok) {
           const copy = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          return response;
+        }
+        return response;
+      })
+      .catch(() =>
+        caches.match(request).then((cached) => {
+          if (cached) return cached;
+          if (request.mode === "navigate") return caches.match("./offline.html");
+          return Response.error();
         })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match("./offline.html")))
-    );
-    return;
-  }
-
-  // Stale-while-revalidate : sert le cache immediatement (rapide, marche
-  // hors-ligne) tout en rafraichissant le cache en arriere-plan a chaque
-  // visite, pour ne jamais rester bloque sur une vieille version.
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      const networkFetch = fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          }
-          return response;
-        })
-        .catch(() => cached);
-      return cached || networkFetch;
-    })
+      )
   );
 });
 
