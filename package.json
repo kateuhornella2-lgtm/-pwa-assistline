@@ -4,7 +4,6 @@
   "private": true,
   "description": "Demo PWA hotline support client avec Web Push reel via Netlify Functions",
   "dependencies": {
-    "@netlify/blobs": "^8.1.0",
     "web-push": "^3.6.7"
   }
 }

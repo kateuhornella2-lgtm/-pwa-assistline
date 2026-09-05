@@ -1,5 +1,4 @@
 const webpush = require("web-push");
-const { getStore } = require("@netlify/blobs");
 
 webpush.setVapidDetails(
   "mailto:support@assistline.demo",
@@ -12,11 +11,15 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  const store = getStore("push-subscriptions");
-  const { blobs } = await store.list();
+  let subscription;
+  try {
+    subscription = JSON.parse(event.body).subscription;
+  } catch {
+    return { statusCode: 400, body: JSON.stringify({ error: "Invalid JSON" }) };
+  }
 
-  if (blobs.length === 0) {
-    return { statusCode: 404, body: JSON.stringify({ error: "Aucun abonnement enregistre" }) };
+  if (!subscription || !subscription.endpoint) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Missing subscription" }) };
   }
 
   const payload = JSON.stringify({
@@ -24,21 +27,10 @@ exports.handler = async (event) => {
     body: "Un agent a repondu a votre ticket. Ouvrez l'app pour le consulter.",
   });
 
-  let sent = 0;
-  await Promise.all(
-    blobs.map(async ({ key }) => {
-      const subscription = await store.get(key, { type: "json" });
-      if (!subscription) return;
-      try {
-        await webpush.sendNotification(subscription, payload);
-        sent += 1;
-      } catch (err) {
-        if (err.statusCode === 404 || err.statusCode === 410) {
-          await store.delete(key);
-        }
-      }
-    })
-  );
-
-  return { statusCode: 200, body: JSON.stringify({ ok: true, sent }) };
+  try {
+    await webpush.sendNotification(subscription, payload);
+    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
+  } catch (err) {
+    return { statusCode: err.statusCode || 500, body: JSON.stringify({ error: err.message }) };
+  }
 };

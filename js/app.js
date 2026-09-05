@@ -235,13 +235,11 @@
         });
       }
 
-      await fetch("/.netlify/functions/subscribe", {
+      const response = await fetch("/.netlify/functions/send-test-push", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(subscription),
+        body: JSON.stringify({ subscription }),
       });
-
-      const response = await fetch("/.netlify/functions/send-test-push", { method: "POST" });
       showToast(response.ok ? "Push envoye par le serveur ! Vous pouvez fermer l'app." : "Abonnement enregistre, mais l'envoi a echoue.");
     } catch (err) {
       console.error(err);
