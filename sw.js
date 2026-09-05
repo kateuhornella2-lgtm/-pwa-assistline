@@ -1,4 +1,4 @@
-const CACHE_NAME = "assistline-v3";
+const CACHE_NAME = "assistline-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -60,4 +60,32 @@ self.addEventListener("message", (event) => {
     const { title, options } = event.data;
     self.registration.showNotification(title, options);
   }
+});
+
+// Vrai Web Push : declenche par le serveur (Netlify Function), fonctionne
+// meme si l'app est fermee.
+self.addEventListener("push", (event) => {
+  let data = { title: "AssistLine", body: "Vous avez une nouvelle notification." };
+  if (event.data) {
+    try { data = event.data.json(); } catch { data.body = event.data.text(); }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "icons/icon.svg",
+      badge: "icons/icon.svg",
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      const existing = clients.find((c) => "focus" in c);
+      if (existing) return existing.focus();
+      return self.clients.openWindow("./index.html");
+    })
+  );
 });

@@ -199,13 +199,23 @@
     });
   });
 
-  // ---------- Notification demo ----------
+  // ---------- Push notifications (reel, via serveur) ----------
+  const VAPID_PUBLIC_KEY = "BCwp8E6J4cF9NhpzKsXTYEqywRZcW6KOH4KnAmeUIDc0xldw_ysjjfozASRm7dho7B2JkgaBiDt1qvBHDuFjyVs";
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
+  }
+
   const notifyBtn = document.getElementById("notifyBtn");
   notifyBtn.addEventListener("click", async () => {
-    if (!("Notification" in window)) {
-      showToast("Les notifications ne sont pas supportees par ce navigateur.");
+    if (!("Notification" in window) || !("PushManager" in window) || !("serviceWorker" in navigator)) {
+      showToast("Les notifications push ne sont pas supportees par ce navigateur.");
       return;
     }
+
     let permission = Notification.permission;
     if (permission === "default") {
       permission = await Notification.requestPermission();
@@ -215,18 +225,27 @@
       return;
     }
 
-    const title = "AssistLine - Nouvelle reponse";
-    const options = {
-      body: "Un agent a repondu a votre ticket. Ouvrez l'app pour le consulter.",
-      icon: "icons/icon.svg",
-      badge: "icons/icon.svg",
-    };
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        });
+      }
 
-    const registration = await navigator.serviceWorker.getRegistration();
-    if (registration) {
-      registration.showNotification(title, options);
-    } else {
-      new Notification(title, options);
+      await fetch("/.netlify/functions/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subscription),
+      });
+
+      const response = await fetch("/.netlify/functions/send-test-push", { method: "POST" });
+      showToast(response.ok ? "Push envoye par le serveur ! Vous pouvez fermer l'app." : "Abonnement enregistre, mais l'envoi a echoue.");
+    } catch (err) {
+      console.error(err);
+      showToast("Erreur lors de l'abonnement aux notifications push.");
     }
   });
 })();
